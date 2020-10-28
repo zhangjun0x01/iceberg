@@ -20,6 +20,7 @@
 package org.apache.iceberg.hadoop;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileAlreadyExistsException;
 import org.apache.hadoop.fs.FileSystem;
@@ -108,6 +109,15 @@ public class HadoopOutputFile implements OutputFile {
   @Override
   public InputFile toInputFile() {
     return HadoopInputFile.fromPath(path, fs, conf);
+  }
+
+  @Override
+  public long length() {
+    try {
+      return fs.getFileStatus(path).getLen();
+    } catch (IOException e) {
+      throw new UncheckedIOException("get error file status error", e);
+    }
   }
 
   @Override

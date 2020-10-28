@@ -37,7 +37,7 @@ public interface OutputFile {
    *
    * @return an output stream that can report its position
    * @throws AlreadyExistsException If the path already exists
-   * @throws RuntimeIOException If the implementation throws an {@link IOException}
+   * @throws RuntimeIOException     If the implementation throws an {@link IOException}
    */
   PositionOutputStream create();
 
@@ -64,4 +64,6 @@ public interface OutputFile {
    * @return an input file for the location of this output file
    */
   InputFile toInputFile();
+
+  long length();
 }

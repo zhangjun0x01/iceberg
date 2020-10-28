@@ -125,7 +125,7 @@ public abstract class BaseTaskWriter<T> implements TaskWriter<T> {
           DataFile dataFile = DataFiles.builder(spec)
               .withEncryptionKeyMetadata(currentFile.keyMetadata())
               .withPath(currentFile.encryptingOutputFile().location())
-              .withFileSizeInBytes(fileSizeInBytes)
+              .withFileSizeInBytes(currentFile.encryptingOutputFile().length())
               .withPartition(spec.fields().size() == 0 ? null : partitionKey) // set null if unpartitioned
               .withMetrics(metrics)
               .withSplitOffsets(splitOffsets)

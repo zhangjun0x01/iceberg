@@ -60,8 +60,8 @@ public class Files {
 
       if (!file.getParentFile().isDirectory() && !file.getParentFile().mkdirs()) {
         throw new RuntimeIOException(
-                "Failed to create the file's directory at %s.",
-                file.getParentFile().getAbsolutePath());
+            "Failed to create the file's directory at %s.",
+            file.getParentFile().getAbsolutePath());
       }
 
       try {
@@ -89,6 +89,11 @@ public class Files {
     @Override
     public InputFile toInputFile() {
       return localInput(file);
+    }
+
+    @Override
+    public long length() {
+      return file.length();
     }
 
     @Override
