@@ -22,6 +22,8 @@ package org.apache.iceberg.flink.actions;
 import java.util.List;
 import org.apache.flink.table.catalog.exceptions.DatabaseNotExistException;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.iceberg.catalog.Catalog;
 import org.junit.Test;
 
 public class TestMigrateAction {
@@ -34,5 +36,22 @@ public class TestMigrateAction {
     List<String> list = hiveCatalog.listTables("default");
     list.stream().forEach(System.out::println);
 
+  }
+
+  @Test
+  public void testMigrate() {
+    HiveCatalog hiveCatalog = new HiveCatalog("hive", "default", "/Users/user/work/hive/conf");
+    hiveCatalog.open();
+    String hiveSourceDbName = "default";
+    String hiveSourceTableName = "orc_test7";
+
+    Catalog icebergCatalog =
+        new org.apache.iceberg.hive.HiveCatalog("hive", "hdfs://10.160.85.185/user/hive/warehouse", 2,
+            new Configuration());
+    String icebergDbName = "iceberg_db";
+    String icebergTableName = "iceberg_orc_test7";
+    MigrateAction action = new MigrateAction(hiveCatalog, hiveSourceDbName, hiveSourceTableName,
+        icebergCatalog, icebergDbName, icebergTableName);
+    action.execute();
   }
 }
