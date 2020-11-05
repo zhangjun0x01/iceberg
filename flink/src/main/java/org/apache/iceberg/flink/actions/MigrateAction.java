@@ -49,6 +49,7 @@ import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.actions.Action;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.flink.FlinkSchemaUtil;
 import org.apache.iceberg.hadoop.HadoopInputFile;
 import org.apache.iceberg.mapping.NameMapping;
 import org.apache.iceberg.mapping.NameMappingParser;
@@ -93,10 +94,9 @@ public class MigrateAction implements Action {
       // create a target iceberg table
       CatalogBaseTable table = new CatalogTableImpl(hiveTableSchema, null, tableComment);
       ObjectPath tableTarget = new ObjectPath(icebergDbName, icebergTableName);
-      flinkCatalog.createTable(tableTarget, table, false);
-
-
       TableIdentifier identifier = TableIdentifier.of(icebergDbName, icebergTableName);
+
+      icebergCatalog.createTable(identifier, FlinkSchemaUtil.convert(hiveTableSchema));
       Table icebergTable = icebergCatalog.loadTable(identifier);
       //把hive的数据导入到iceberg中
       importTable(icebergTable, hiveCatalog, tableSource);
