@@ -69,6 +69,7 @@
             <property name="tokens" value="VARIABLE_DEF"/>
             <property name="allowSamelineMultipleAnnotations" value="true"/>
         </module>
+        <module name="MissingOverride"/>
         <module name="AnnotationUseStyle"/> <!-- Java Style Guide: Annotations -->
         <module name="ArrayTypeStyle"/> <!-- Java Style Guide: No C-style array declarations -->
         <module name="AvoidEscapedUnicodeCharacters"> <!-- Java Style Guide: Non-ASCII characters -->
