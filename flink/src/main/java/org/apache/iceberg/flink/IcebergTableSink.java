@@ -21,19 +21,22 @@ package org.apache.iceberg.flink;
 
 import java.util.Map;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.data.RowData;
-import org.apache.flink.table.sinks.AppendStreamTableSink;
 import org.apache.flink.table.sinks.OverwritableTableSink;
 import org.apache.flink.table.sinks.PartitionableTableSink;
 import org.apache.flink.table.sinks.TableSink;
+import org.apache.flink.table.sinks.UpsertStreamTableSink;
 import org.apache.flink.table.types.DataType;
-import org.apache.flink.util.Preconditions;
 import org.apache.iceberg.flink.sink.FlinkSink;
+import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 
-public class IcebergTableSink implements AppendStreamTableSink<RowData>, OverwritableTableSink, PartitionableTableSink {
+public class IcebergTableSink
+    implements UpsertStreamTableSink<RowData>, OverwritableTableSink,
+    PartitionableTableSink {
   private final boolean isBounded;
   private final TableLoader tableLoader;
   private final TableSchema tableSchema;
@@ -47,17 +50,6 @@ public class IcebergTableSink implements AppendStreamTableSink<RowData>, Overwri
   }
 
   @Override
-  public DataStreamSink<?> consumeDataStream(DataStream<RowData> dataStream) {
-    Preconditions.checkState(!overwrite || isBounded, "Unbounded data stream doesn't support overwrite operation.");
-
-    return FlinkSink.forRowData(dataStream)
-        .tableLoader(tableLoader)
-        .tableSchema(tableSchema)
-        .overwrite(overwrite)
-        .build();
-  }
-
-  @Override
   public DataType getConsumedDataType() {
     return tableSchema.toRowDataType().bridgedTo(RowData.class);
   }
@@ -68,7 +60,7 @@ public class IcebergTableSink implements AppendStreamTableSink<RowData>, Overwri
   }
 
   @Override
-  public TableSink<RowData> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
+  public TableSink<Tuple2<Boolean, RowData>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
     // This method has been deprecated and it will be removed in future version, so left the empty implementation here.
     return this;
   }
@@ -81,5 +73,30 @@ public class IcebergTableSink implements AppendStreamTableSink<RowData>, Overwri
   @Override
   public void setStaticPartition(Map<String, String> partitions) {
     // The flink's PartitionFanoutWriter will handle the static partition write policy automatically.
+  }
+
+  @Override
+  public void setKeyFields(String[] keys) {
+
+  }
+
+  @Override
+  public void setIsAppendOnly(Boolean isAppendOnly) {
+  }
+
+  @Override
+  public TypeInformation<RowData> getRecordType() {
+    return null;
+  }
+
+  @Override
+  public DataStreamSink<?> consumeDataStream(DataStream<Tuple2<Boolean, RowData>> dataStream) {
+    Preconditions.checkState(!overwrite || isBounded, "Unbounded data stream doesn't support overwrite operation.");
+
+    return FlinkSink.forRowData(dataStream.map(r -> r.f1))
+        .tableLoader(tableLoader)
+        .tableSchema(tableSchema)
+        .overwrite(overwrite)
+        .build();
   }
 }

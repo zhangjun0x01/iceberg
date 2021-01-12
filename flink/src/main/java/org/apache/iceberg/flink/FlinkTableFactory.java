@@ -21,6 +21,7 @@ package org.apache.iceberg.flink;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.data.RowData;
@@ -30,7 +31,7 @@ import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.table.utils.TableSchemaUtils;
 
-public class FlinkTableFactory implements TableSinkFactory<RowData>, TableSourceFactory<RowData> {
+public class FlinkTableFactory implements TableSinkFactory<Tuple2<Boolean, RowData>>, TableSourceFactory<RowData> {
   private final FlinkCatalog catalog;
 
   public FlinkTableFactory(FlinkCatalog catalog) {
@@ -46,7 +47,7 @@ public class FlinkTableFactory implements TableSinkFactory<RowData>, TableSource
   }
 
   @Override
-  public TableSink<RowData> createTableSink(TableSinkFactory.Context context) {
+  public TableSink<Tuple2<Boolean, RowData>> createTableSink(TableSinkFactory.Context context) {
     ObjectPath objectPath = context.getObjectIdentifier().toObjectPath();
     TableLoader tableLoader = createTableLoader(objectPath);
     TableSchema tableSchema = TableSchemaUtils.getPhysicalSchema(context.getTable().getSchema());
