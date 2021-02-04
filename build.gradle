@@ -332,6 +332,7 @@ project(':iceberg-flink') {
     testCompile "org.apache.flink:flink-runtime_2.12"
     testCompile "org.apache.flink:flink-table-planner-blink_2.12"
     testCompile "org.apache.flink:flink-test-utils-junit"
+    testCompile "com.alibaba.ververica:flink-connector-mysql-cdc"
     testCompile("org.apache.flink:flink-test-utils_2.12") {
       exclude group: "org.apache.curator", module: 'curator-test'
     }

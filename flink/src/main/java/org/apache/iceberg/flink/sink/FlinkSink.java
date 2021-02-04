@@ -19,6 +19,13 @@
 
 package org.apache.iceberg.flink.sink;
 
+import static org.apache.iceberg.TableProperties.DEFAULT_FILE_FORMAT;
+import static org.apache.iceberg.TableProperties.DEFAULT_FILE_FORMAT_DEFAULT;
+import static org.apache.iceberg.TableProperties.WRITE_DISTRIBUTION_MODE;
+import static org.apache.iceberg.TableProperties.WRITE_DISTRIBUTION_MODE_DEFAULT;
+import static org.apache.iceberg.TableProperties.WRITE_TARGET_FILE_SIZE_BYTES;
+import static org.apache.iceberg.TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -42,23 +49,18 @@ import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
+import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.flink.FlinkSchemaUtil;
 import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.io.WriteResult;
 import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
+import org.apache.iceberg.relocated.com.google.common.base.Splitter;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.types.TypeUtil;
 import org.apache.iceberg.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.iceberg.TableProperties.DEFAULT_FILE_FORMAT;
-import static org.apache.iceberg.TableProperties.DEFAULT_FILE_FORMAT_DEFAULT;
-import static org.apache.iceberg.TableProperties.WRITE_DISTRIBUTION_MODE;
-import static org.apache.iceberg.TableProperties.WRITE_DISTRIBUTION_MODE_DEFAULT;
-import static org.apache.iceberg.TableProperties.WRITE_TARGET_FILE_SIZE_BYTES;
-import static org.apache.iceberg.TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT;
 
 public class FlinkSink {
   private static final Logger LOG = LoggerFactory.getLogger(FlinkSink.class);
@@ -66,13 +68,15 @@ public class FlinkSink {
   private static final String ICEBERG_STREAM_WRITER_NAME = IcebergStreamWriter.class.getSimpleName();
   private static final String ICEBERG_FILES_COMMITTER_NAME = IcebergFilesCommitter.class.getSimpleName();
 
+  private static final Splitter COMMA = Splitter.on(',');
+
   private FlinkSink() {
   }
 
   /**
-   * Initialize a {@link Builder} to export the data from generic input data stream into iceberg table. We use
-   * {@link RowData} inside the sink connector, so users need to provide a mapper function and a
-   * {@link TypeInformation} to convert those generic records to a RowData DataStream.
+   * Initialize a {@link Builder} to export the data from generic input data stream into iceberg table. We use {@link
+   * RowData} inside the sink connector, so users need to provide a mapper function and a {@link TypeInformation} to
+   * convert those generic records to a RowData DataStream.
    *
    * @param input      the generic source input data stream.
    * @param mapper     function to convert the generic data to {@link RowData}
@@ -134,9 +138,9 @@ public class FlinkSink {
     }
 
     /**
-     * This iceberg {@link Table} instance is used for initializing {@link IcebergStreamWriter} which will write all
-     * the records into {@link DataFile}s and emit them to downstream operator. Providing a table would avoid so many
-     * table loading from each separate task.
+     * This iceberg {@link Table} instance is used for initializing {@link IcebergStreamWriter} which will write all the
+     * records into {@link DataFile}s and emit them to downstream operator. Providing a table would avoid so many table
+     * loading from each separate task.
      *
      * @param newTable the loaded iceberg table instance.
      * @return {@link Builder} to connect the iceberg table.
@@ -170,8 +174,8 @@ public class FlinkSink {
     }
 
     /**
-     * Configure the write {@link DistributionMode} that the flink sink will use. Currently, flink support
-     * {@link DistributionMode#NONE} and {@link DistributionMode#HASH}.
+     * Configure the write {@link DistributionMode} that the flink sink will use. Currently, flink support {@link
+     * DistributionMode#NONE} and {@link DistributionMode#HASH}.
      *
      * @param mode to specify the write distribution mode.
      * @return {@link Builder} to connect the iceberg table.
@@ -218,6 +222,12 @@ public class FlinkSink {
         } catch (IOException e) {
           throw new UncheckedIOException("Failed to load iceberg table from table loader: " + tableLoader, e);
         }
+      }
+
+      Map<String, String> properties = table.properties();
+      String equalColumns = PropertyUtil.propertyAsString(properties, TableProperties.EQUALITY_FIELD_COLUMNS, null);
+      if (equalColumns != null) {
+        equalityFieldColumns = Lists.newArrayList(COMMA.split(equalColumns));
       }
 
       // Find out the equality field id list based on the user-provided equality field column names.
