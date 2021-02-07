@@ -24,13 +24,14 @@ public class TestWriteCDC {
     env.setParallelism(1);
 
     RowData rowData = GenericRowData.ofKind(RowKind.INSERT, 1, StringData.fromString("AAA"));
+//    RowData rowData1 = GenericRowData.ofKind(RowKind.INSERT, 1, StringData.fromString("AAA"));
 
-    RowData rowData1 = GenericRowData.ofKind(RowKind.UPDATE_BEFORE, 1, StringData.fromString("AAA"));
-    RowData rowData2 = GenericRowData.ofKind(RowKind.UPDATE_AFTER, 1, StringData.fromString("BBB"));
+//    RowData rowData1 = GenericRowData.ofKind(RowKind.UPDATE_BEFORE, 1, StringData.fromString("AAA"));
+//    RowData rowData2 = GenericRowData.ofKind(RowKind.UPDATE_AFTER, 1, StringData.fromString("BBB"));
 
-    DataStream<RowData> dataStream = env.fromElements(rowData, rowData1, rowData2);
+    DataStream<RowData> dataStream = env.fromElements(rowData);
 
-    TableIdentifier identifier = TableIdentifier.of("iceberg_db", "iceberg_cdc_test4");
+    TableIdentifier identifier = TableIdentifier.of("iceberg_db", "iceberg_cdc_test8");
     Configuration configuration = new Configuration();
     String uri = "thrift://10.160.85.186:9083";
     Map map = new HashMap<>();

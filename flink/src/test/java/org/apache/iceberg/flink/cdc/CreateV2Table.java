@@ -18,6 +18,8 @@ import org.apache.iceberg.types.Types;
 public class CreateV2Table {
   public static void main(String[] args) {
 
+    String tablename = "iceberg_cdc_test8";
+
     Configuration configuration = new Configuration();
     String uri = "thrift://10.160.85.186:9083";
     Map map = new HashMap<>();
@@ -25,7 +27,7 @@ public class CreateV2Table {
     CatalogLoader catalogLoader = CatalogLoader.hive("iceberg", configuration, map);
     HiveCatalog hiveCatalog = (HiveCatalog) catalogLoader.loadCatalog();
 
-    TableIdentifier identifierNew = TableIdentifier.of("iceberg_db", "iceberg_cdc_test4");
+    TableIdentifier identifierNew = TableIdentifier.of("iceberg_db", tablename);
     TableOperations ops = hiveCatalog.newTableOps(identifierNew);
 
     Schema schema = new Schema(
@@ -38,7 +40,7 @@ public class CreateV2Table {
             schema,
             PartitionSpec.unpartitioned(),
             SortOrder.unsorted(),
-            "hdfs://10.160.85.185/user/hive2/warehouse/iceberg_db.db/iceberg_cdc_test4",
+            "hdfs://10.160.85.185/user/hive2/warehouse/iceberg_db.db/" + tablename,
             Maps.newHashMap(),
             2);
     ops.commit(null, metadata);
