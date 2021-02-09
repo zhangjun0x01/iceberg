@@ -80,9 +80,9 @@ import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 /**
  * A Flink Catalog implementation that wraps an Iceberg {@link Catalog}.
  * <p>
- * The mapping between Flink database and Iceberg namespace:
- * Supplying a base namespace for a given catalog, so if you have a catalog that supports a 2-level namespace, you
- * would supply the first level in the catalog configuration and the second level would be exposed as Flink databases.
+ * The mapping between Flink database and Iceberg namespace: Supplying a base namespace for a given catalog, so if you
+ * have a catalog that supports a 2-level namespace, you would supply the first level in the catalog configuration and
+ * the second level would be exposed as Flink databases.
  * <p>
  * The Iceberg table manages its partitions by itself. The partition of the Iceberg table is independent of the
  * partition of Flink.
@@ -309,7 +309,7 @@ public class FlinkCatalog extends AbstractCatalog {
     return toCatalogTable(table);
   }
 
-  private Table loadIcebergTable(ObjectPath tablePath) throws TableNotExistException {
+  public Table loadIcebergTable(ObjectPath tablePath) throws TableNotExistException {
     try {
       Table table = icebergCatalog.loadTable(toIdentifier(tablePath));
       if (cacheEnabled) {
@@ -573,7 +573,7 @@ public class FlinkCatalog extends AbstractCatalog {
 
   @Override
   public void createPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogPartition partition,
-      boolean ignoreIfExists) throws CatalogException {
+                              boolean ignoreIfExists) throws CatalogException {
     throw new UnsupportedOperationException();
   }
 
@@ -585,7 +585,7 @@ public class FlinkCatalog extends AbstractCatalog {
 
   @Override
   public void alterPartition(ObjectPath tablePath, CatalogPartitionSpec partitionSpec, CatalogPartition newPartition,
-      boolean ignoreIfNotExists) throws CatalogException {
+                             boolean ignoreIfNotExists) throws CatalogException {
     throw new UnsupportedOperationException();
   }
 
@@ -624,25 +624,27 @@ public class FlinkCatalog extends AbstractCatalog {
 
   @Override
   public void alterTableStatistics(ObjectPath tablePath, CatalogTableStatistics tableStatistics,
-      boolean ignoreIfNotExists) throws CatalogException {
+                                   boolean ignoreIfNotExists) throws CatalogException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void alterTableColumnStatistics(ObjectPath tablePath, CatalogColumnStatistics columnStatistics,
-      boolean ignoreIfNotExists) throws CatalogException {
+                                         boolean ignoreIfNotExists) throws CatalogException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void alterPartitionStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
-      CatalogTableStatistics partitionStatistics, boolean ignoreIfNotExists) throws CatalogException {
+                                       CatalogTableStatistics partitionStatistics, boolean ignoreIfNotExists)
+      throws CatalogException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void alterPartitionColumnStatistics(ObjectPath tablePath, CatalogPartitionSpec partitionSpec,
-      CatalogColumnStatistics columnStatistics, boolean ignoreIfNotExists) throws CatalogException {
+                                             CatalogColumnStatistics columnStatistics, boolean ignoreIfNotExists)
+      throws CatalogException {
     throw new UnsupportedOperationException();
   }
 

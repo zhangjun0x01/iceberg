@@ -10,6 +10,7 @@ import org.apache.iceberg.Schema;
 import org.apache.iceberg.SortOrder;
 import org.apache.iceberg.TableMetadata;
 import org.apache.iceberg.TableOperations;
+import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.hive.HiveCatalog;
@@ -18,7 +19,7 @@ import org.apache.iceberg.types.Types;
 public class CreateV2Table {
   public static void main(String[] args) {
 
-    String tablename = "iceberg_cdc_test8";
+    String tablename = "iceberg_cdc_test10";
 
     Configuration configuration = new Configuration();
     String uri = "thrift://10.160.85.186:9083";
@@ -35,13 +36,16 @@ public class CreateV2Table {
         Types.NestedField.optional(2, "data", Types.StringType.get())
     );
 
+    Map<String, String> properties = Maps.newHashMap();
+    properties.put(TableProperties.EQUALITY_FIELD_COLUMNS, "id");
+
     TableMetadata metadata =
         TableMetadata.newTableMetadata(
             schema,
             PartitionSpec.unpartitioned(),
             SortOrder.unsorted(),
             "hdfs://10.160.85.185/user/hive2/warehouse/iceberg_db.db/" + tablename,
-            Maps.newHashMap(),
+            properties,
             2);
     ops.commit(null, metadata);
   }

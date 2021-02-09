@@ -44,6 +44,6 @@ public class TestCDC2Iceberg {
     tenv.executeSql(sql);
 
 //    tenv.executeSql("select * from mysql_binlog").print();
-    tenv.executeSql("insert into iceberg.iceberg_db.iceberg_cdc_05 select * from mysql_binlog");
+    tenv.executeSql("insert into iceberg.iceberg_db.iceberg_cdc_test10 select * from mysql_binlog");
   }
 }
