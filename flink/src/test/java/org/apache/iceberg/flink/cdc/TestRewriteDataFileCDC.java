@@ -14,12 +14,10 @@
 
 package org.apache.iceberg.flink.cdc;
 
-import akka.remote.serialization.ProtobufSerializer;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.exceptions.TableNotExistException;
-import org.apache.iceberg.BaseCombinedScanTask;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.flink.FlinkCatalog;
 import org.apache.iceberg.flink.actions.Actions;
@@ -27,8 +25,6 @@ import org.apache.iceberg.flink.actions.Actions;
 public class TestRewriteDataFileCDC {
   public static void main(String[] args) throws TableNotExistException {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    // 使用 Kryo 注册 Google Protobuf 序列化器
-    env.getConfig().registerTypeWithKryoSerializer(BaseCombinedScanTask.class, new ProtobufSerializer());
     env.setParallelism(1);
     env.enableCheckpointing(10000);
     StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
@@ -41,7 +37,7 @@ public class TestRewriteDataFileCDC {
             + ")");
 
     FlinkCatalog flinkCatalog = (FlinkCatalog) tenv.getCatalog("iceberg").get();
-    Table icebergTable = flinkCatalog.loadIcebergTable(new ObjectPath("iceberg_db", "iceberg_cdc_test10"));
+    Table icebergTable = flinkCatalog.loadIcebergTable(new ObjectPath("iceberg_db", "iceberg_cdc_test11"));
 
     Actions.forTable(env, icebergTable).rewriteDataFiles().execute();
   }

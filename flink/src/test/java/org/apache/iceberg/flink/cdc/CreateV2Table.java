@@ -19,7 +19,7 @@ import org.apache.iceberg.types.Types;
 public class CreateV2Table {
   public static void main(String[] args) {
 
-    String tablename = "iceberg_cdc_test10";
+    String tablename = "iceberg_cdc_test11";
 
     Configuration configuration = new Configuration();
     String uri = "thrift://10.160.85.186:9083";

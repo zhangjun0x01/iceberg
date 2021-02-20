@@ -434,7 +434,8 @@ abstract class BaseFile<F>
     if (map != null) {
       Map<K, V> copy = Maps.newHashMapWithExpectedSize(map.size());
       copy.putAll(map);
-      return Collections.unmodifiableMap(copy);
+      return copy;
+//      return Collections.unmodifiableMap(copy);
     }
     return null;
   }
