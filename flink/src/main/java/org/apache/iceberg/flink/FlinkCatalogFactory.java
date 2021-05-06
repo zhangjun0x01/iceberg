@@ -22,13 +22,14 @@ package org.apache.iceberg.flink;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.GlobalConfiguration;
 import org.apache.flink.runtime.util.HadoopUtils;
 import org.apache.flink.table.catalog.Catalog;
-import org.apache.flink.table.descriptors.CatalogDescriptorValidator;
 import org.apache.flink.table.factories.CatalogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -36,8 +37,6 @@ import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.base.Strings;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
-import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 
 /**
  * A Flink Catalog factory implementation that creates {@link FlinkCatalog}.
@@ -100,17 +99,32 @@ public class FlinkCatalogFactory implements CatalogFactory {
   }
 
   @Override
-  public Map<String, String> requiredContext() {
-    Map<String, String> context = Maps.newHashMap();
-    context.put(CatalogDescriptorValidator.CATALOG_TYPE, "iceberg");
-    context.put(CatalogDescriptorValidator.CATALOG_PROPERTY_VERSION, "1");
-    return context;
+  public String factoryIdentifier() {
+    return FlinkCatalogFactoryOptions.IDENTIFIER;
   }
 
   @Override
-  public List<String> supportedProperties() {
-    return ImmutableList.of("*");
+  public Set<ConfigOption<?>> requiredOptions() {
+    final Set<ConfigOption<?>> options = new HashSet<>();
+    options.add(FlinkCatalogFactoryOptions.CATALOG_TYPE);
+    options.add(FlinkCatalogFactoryOptions.PROPERTY_VERSION);
+    return options;
   }
+
+//  @Override
+//  public Catalog createCatalog(Context context) {
+//    final FactoryUtil.CatalogFactoryHelper helper =
+//            FactoryUtil.createCatalogFactoryHelper(this, context);
+//    helper.validate();
+//
+//    return createCatalog(context.getName(), helper.getOptions(), clusterHadoopConf());
+//    return new HiveCatalog(
+//            context.getName(),
+//            helper.getOptions().get(DEFAULT_DATABASE),
+//            helper.getOptions().get(HIVE_CONF_DIR),
+//            helper.getOptions().get(HADOOP_CONF_DIR),
+//            helper.getOptions().get(HIVE_VERSION));
+//  }
 
   @Override
   public Catalog createCatalog(String name, Map<String, String> properties) {
