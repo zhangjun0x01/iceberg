@@ -31,10 +31,12 @@ import org.apache.flink.configuration.GlobalConfiguration;
 import org.apache.flink.runtime.util.HadoopUtils;
 import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.factories.CatalogFactory;
+import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.catalog.Namespace;
+import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.base.Strings;
 
@@ -111,25 +113,25 @@ public class FlinkCatalogFactory implements CatalogFactory {
     return options;
   }
 
-//  @Override
-//  public Catalog createCatalog(Context context) {
-//    final FactoryUtil.CatalogFactoryHelper helper =
-//            FactoryUtil.createCatalogFactoryHelper(this, context);
-//    helper.validate();
-//
-//    return createCatalog(context.getName(), helper.getOptions(), clusterHadoopConf());
+  @Override
+  public Catalog createCatalog(Context context) {
+    final FactoryUtil.CatalogFactoryHelper helper =
+            FactoryUtil.createCatalogFactoryHelper(this, context);
+    helper.validate();
+
+    return createCatalog(context.getName(), context.getOptions(), clusterHadoopConf());
 //    return new HiveCatalog(
 //            context.getName(),
 //            helper.getOptions().get(DEFAULT_DATABASE),
 //            helper.getOptions().get(HIVE_CONF_DIR),
 //            helper.getOptions().get(HADOOP_CONF_DIR),
 //            helper.getOptions().get(HIVE_VERSION));
-//  }
-
-  @Override
-  public Catalog createCatalog(String name, Map<String, String> properties) {
-    return createCatalog(name, properties, clusterHadoopConf());
   }
+
+//  @Override
+//  public Catalog createCatalog(String name, Map<String, String> properties) {
+//    return createCatalog(name, properties, clusterHadoopConf());
+//  }
 
   protected Catalog createCatalog(String name, Map<String, String> properties, Configuration hadoopConf) {
     CatalogLoader catalogLoader = createCatalogLoader(name, properties, hadoopConf);
